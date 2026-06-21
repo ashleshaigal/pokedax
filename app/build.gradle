@@ -16,12 +16,29 @@ android {
         localPropertiesFile.withInputStream { localProperties.load(it) }
     }
 
+    def versionPropsFile = rootProject.file('version.properties')
+    def versionProps = new Properties()
+    if (versionPropsFile.exists()) {
+        versionPropsFile.withInputStream { versionProps.load(it) }
+    }
+    def vCode = versionProps.getProperty('VERSION_CODE', '1').toInteger()
+    def vName = versionProps.getProperty('VERSION_NAME', '1.0').toDouble()
+
+    def isRelease = gradle.startParameter.taskNames.any { it.contains("Release") }
+    if (isRelease) {
+        vCode += 1
+        vName = (vName + 0.1).round(1)
+        versionProps.setProperty('VERSION_CODE', vCode.toString())
+        versionProps.setProperty('VERSION_NAME', vName.toString())
+        versionPropsFile.withOutputStream { versionProps.store(it, null) }
+    }
+
     defaultConfig {
         applicationId "com.aigal.pokedax"
         minSdk 26
         targetSdk 37
-        versionCode 1
-        versionName "1.0"
+        versionCode vCode
+        versionName vName.toString()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,6 +58,35 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    applicationVariants.all { variant ->
+        if (variant.buildType.name == "release") {
+            variant.outputs.all {
+                outputFileName = "pokedax_${vCode}.apk"
+            }
+        }
+    }
+
+    tasks.configureEach { task ->
+        if (task.name == "bundleRelease") {
+            task.doLast {
+                def bundleDir = layout.buildDirectory.dir("outputs/bundle/release").get().asFile
+                def customDir = file("release")
+                
+                // Check default location
+                def oldFile = new File(bundleDir, "app-release.aab")
+                if (oldFile.exists()) {
+                    oldFile.renameTo(new File(bundleDir, "pokedax_${vCode}.aab"))
+                }
+                
+                // Check the custom location mentioned
+                def customFile = new File(customDir, "app-release.aab")
+                if (customFile.exists()) {
+                    customFile.renameTo(new File(customDir, "pokedax_${vCode}.aab"))
+                }
+            }
         }
     }
     compileOptions {
