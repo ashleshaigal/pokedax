@@ -5,13 +5,18 @@ import com.aigal.pokedax.data.local.dao.PokemonDao
 import com.aigal.pokedax.data.local.entity.PokemonEntity
 import com.aigal.pokedax.data.remote.PokemonApi
 import com.aigal.pokedax.domain.repository.PokemonRepository
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class PokemonRepositoryImpl @Inject constructor(
     private val api: PokemonApi,
-    private val dao: PokemonDao
+    private val dao: PokemonDao,
+    private val firestore: FirebaseFirestore
 ) : PokemonRepository {
 
     // Remove the sortOrder parameter
@@ -53,5 +58,29 @@ class PokemonRepositoryImpl @Inject constructor(
         return dao.getPokemonById(id)
     }
 
-    // Remove the sortPokemon method as it's no longer needed here
+    override suspend fun toggleFavorite(pokemon: PokemonEntity, userId: String) {
+        val docRef = firestore.collection("users").document(userId)
+            .collection("favorites").document(pokemon.id.toString())
+
+        val doc = docRef.get().await()
+        if (doc.exists()) {
+            docRef.delete().await()
+        } else {
+            docRef.set(pokemon).await()
+        }
+    }
+
+    override fun getFavoriteIds(userId: String): Flow<Set<Int>> = callbackFlow {
+        val listener = firestore.collection("users").document(userId)
+            .collection("favorites")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val ids = snapshot?.documents?.mapNotNull { it.id.toIntOrNull() }?.toSet() ?: emptySet()
+                trySend(ids)
+            }
+        awaitClose { listener.remove() }
+    }
 }

@@ -11,14 +11,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.aigal.pokedax.ui.components.CommonTopBar
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.aigal.pokedax.data.local.entity.PokemonEntity
 import com.aigal.pokedax.ui.list.components.PokemonTypeChip
+import com.aigal.pokedax.ui.theme.PokedaxTheme
 
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -30,19 +33,10 @@ fun PokemonDetailScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = pokemon?.name ?: "Pokémon Details")
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFF0F0F0))
+            CommonTopBar(
+                title = pokemon?.name ?: "Pokémon Details",
+                showBackButton = true,
+                onBackClick = { navController.popBackStack() }
             )
         }
     ) { innerPadding ->
@@ -104,6 +98,29 @@ fun BaseStatsSection(pokemon: PokemonEntity) {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun BaseStatsSectionPreview() {
+    PokedaxTheme {
+        BaseStatsSection(
+            pokemon = PokemonEntity(
+                id = 1,
+                name = "Bulbasaur",
+                imageUrl = "",
+                type = listOf("Grass", "Poison"),
+                hp = 45,
+                attack = 49,
+                defense = 49,
+                spAttack = 65,
+                spDefense = 65,
+                speed = 45,
+                species = "Seed Pokémon",
+                description = "Bulbasaur..."
+            )
+        )
+    }
+}
+
 @Composable
 fun StatRow(label: String, value: Int) {
     Row(
@@ -113,5 +130,13 @@ fun StatRow(label: String, value: Int) {
         Text(text = label, modifier = Modifier.width(120.dp))
         Text(text = value.toString(), modifier = Modifier.width(40.dp))
         // Placeholder for the progress bar
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun StatRowPreview() {
+    PokedaxTheme {
+        StatRow(label = "HP", value = 45)
     }
 }

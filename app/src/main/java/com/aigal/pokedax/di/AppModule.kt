@@ -8,6 +8,7 @@ import com.aigal.pokedax.data.remote.PokemonApi
 import com.aigal.pokedax.domain.repository.PokemonRepository
 import com.aigal.pokedax.data.repository.PokemonRepositoryImpl
 import com.aigal.pokedax.util.Constants.BASE_URL
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -55,10 +56,17 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideFirebaseFirestore(): FirebaseFirestore {
+        return FirebaseFirestore.getInstance()
+    }
+
+    @Provides
+    @Singleton
     fun providePokemonRepository(
         api: PokemonApi,
-        dao: PokemonDao
+        dao: PokemonDao,
+        firestore: FirebaseFirestore
     ): PokemonRepository {
-        return PokemonRepositoryImpl(api, dao)
+        return PokemonRepositoryImpl(api, dao, firestore)
     }
 }

@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -22,14 +23,12 @@ android {
         versionPropsFile.withInputStream { versionProps.load(it) }
     }
     def vCode = versionProps.getProperty('VERSION_CODE', '1').toInteger()
-    def vName = versionProps.getProperty('VERSION_NAME', '1.0').toDouble()
+    def vName = versionProps.getProperty('VERSION_NAME', '1.0')
 
     def isRelease = gradle.startParameter.taskNames.any { it.contains("Release") }
     if (isRelease) {
         vCode += 1
-        vName = (vName + 0.1).round(1)
         versionProps.setProperty('VERSION_CODE', vCode.toString())
-        versionProps.setProperty('VERSION_NAME', vName.toString())
         versionPropsFile.withOutputStream { versionProps.store(it, null) }
     }
 
@@ -38,7 +37,7 @@ android {
         minSdk 26
         targetSdk 37
         versionCode vCode
-        versionName vName.toString()
+        versionName vName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -107,6 +106,14 @@ dependencies {
     implementation libs.androidx.core.ktx
     implementation libs.androidx.lifecycle.runtime.ktx
     implementation libs.androidx.activity.compose
+
+    // Firebase
+    implementation platform(libs.firebase.bom)
+    implementation libs.firebase.auth
+    implementation libs.firebase.firestore
+    implementation libs.google.id
+    implementation libs.androidx.credentials
+    implementation libs.androidx.credentials.play.services.auth
 
     // Compose
     implementation platform(libs.androidx.compose.bom)
