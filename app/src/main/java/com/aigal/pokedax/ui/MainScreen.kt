@@ -55,7 +55,8 @@ fun MainScreen(viewModel: AuthViewModel = hiltViewModel()) {
                     isLoggedIn = isLoggedIn
                 )
             }
-        }
+        },
+        containerColor = Color.White
     ) { innerPadding ->
         NavHost(
             navController = navController,

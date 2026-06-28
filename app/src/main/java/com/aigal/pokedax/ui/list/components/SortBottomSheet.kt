@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -21,7 +22,7 @@ fun SortButton(
     onSortSelected: (String) -> Unit
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     IconButton(onClick = { showBottomSheet = true }) {
         Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = "Sort")
@@ -30,7 +31,9 @@ fun SortButton(
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = { showBottomSheet = false },
-            sheetState = sheetState
+            sheetState = sheetState,
+            containerColor = Color.White,
+            contentColor = Color.Black
         ) {
             SortBottomSheetContent(
                 currentSort = currentSort,

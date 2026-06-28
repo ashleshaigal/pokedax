@@ -3,17 +3,20 @@ package com.aigal.pokedax.ui.list
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,7 +28,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,9 +38,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.aigal.pokedax.data.local.entity.PokemonEntity
 import com.aigal.pokedax.ui.list.components.PokemonCard
 import com.aigal.pokedax.ui.list.components.SortButton
@@ -93,15 +95,15 @@ fun PokemonListContent(
         val currentScrollOffset = listState.firstVisibleItemScrollOffset
 
         if (currentFirstVisibleItemIndex > previousFirstVisibleItemIndex) {
-            isVisible = false // Scrolling down (item index increasing)
+            isVisible = false // Hide when scrolling down (moving towards bottom)
         } else if (currentFirstVisibleItemIndex < previousFirstVisibleItemIndex) {
-            isVisible = true // Scrolling up (item index decreasing)
+            isVisible = true // Show when scrolling up (moving towards top)
         } else if (currentScrollOffset > previousScrollOffset) {
             if (currentFirstVisibleItemIndex > 0) {
-                isVisible = false // Scrolling down within the same item
+                isVisible = false 
             }
         } else if (currentScrollOffset < previousScrollOffset) {
-            isVisible = true // Scrolling up within the same item
+            isVisible = true
         }
         
         // Always show search bar when at the very top
@@ -114,7 +116,9 @@ fun PokemonListContent(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
     ) {
         AnimatedVisibility(
             visible = isVisible,
@@ -133,17 +137,17 @@ fun PokemonListContent(
                     onValueChange = onSearchQueryChange,
                     modifier = Modifier
                         .weight(1f)
-                        .heightIn(min = 52.dp),
-                    placeholder = { Text("Search Pokémon...", color = Color.Gray) },
+                        .height(52.dp),
+                    placeholder = { Text("Search Pokémon...", color = Color.Gray, fontSize = 14.sp) },
                     leadingIcon = { 
                         Icon(
                             imageVector = Icons.Default.Search, 
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Color.Gray
                         ) 
                     },
                     singleLine = true,
-                    shape = CircleShape,
+                    shape = RoundedCornerShape(26.dp),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color(0xFFF1F3F4),
                         unfocusedContainerColor = Color(0xFFF1F3F4),
@@ -154,6 +158,8 @@ fun PokemonListContent(
                         cursorColor = MaterialTheme.colorScheme.primary
                     )
                 )
+                
+                Spacer(modifier = Modifier.width(8.dp))
 
                 SortButton(
                     currentSort = sortOrder,

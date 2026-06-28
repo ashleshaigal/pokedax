@@ -26,13 +26,13 @@ fun AboutScreen(navController: NavController) {
     Scaffold(
         topBar = {
             CommonTopBar(title = "About", showBackButton = true, onBackClick = { navController.popBackStack() })
-        }
+        },
+        containerColor = Color.White
     ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .background(Color(0xFFF5F5F5)),
+                .padding(padding),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {

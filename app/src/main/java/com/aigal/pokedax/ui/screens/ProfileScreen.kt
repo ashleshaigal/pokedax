@@ -48,7 +48,9 @@ fun ProfileScreen(
     var activeBottomSheet by remember { mutableStateOf<BottomSheetType?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    Scaffold { padding ->
+    Scaffold(
+        containerColor = Color.White
+    ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -159,7 +161,8 @@ fun ProfileScreen(
             onDismissRequest = { activeBottomSheet = null },
             sheetState = sheetState,
             dragHandle = { BottomSheetDefaults.DragHandle() },
-            containerColor = Color.White
+            containerColor = Color.White,
+            contentColor = Color.Black
         ) {
             when (activeBottomSheet) {
                 BottomSheetType.DISCLAIMER -> {

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.*
 import com.aigal.pokedax.ui.MainScreen
 import com.aigal.pokedax.ui.screens.SplashScreen
@@ -28,7 +29,7 @@ class MainActivity : ComponentActivity() {
                 } else {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
+                        color = Color.White
                     ) {
                         MainScreen()
                     }

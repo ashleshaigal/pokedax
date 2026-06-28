@@ -2,14 +2,14 @@ package com.aigal.pokedax.ui.detail
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,43 +38,60 @@ fun PokemonDetailScreen(
                 showBackButton = true,
                 onBackClick = { navController.popBackStack() }
             )
-        }
+        },
+        containerColor = Color.White
     ) { innerPadding ->
-        pokemon?.let { poke ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                item {
-                    Text(text = "#${poke.id} ${poke.name}", fontSize = 32.sp)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            pokemon?.let { poke ->
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 80.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    item {
+                        Text(text = "#${poke.id} ${poke.name}", fontSize = 32.sp)
+                    }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    item {
+                        GlideImage(
+                            model = poke.imageUrl,
+                            contentDescription = poke.name,
+                            modifier = Modifier.size(240.dp)
+                        )
+                    }
 
-                    GlideImage(
-                        model = poke.imageUrl,
-                        contentDescription = poke.name,
-                        modifier = Modifier.size(200.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        poke.type.forEach { type ->
-                            PokemonTypeChip(type = type)
+                    item {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            poke.type.forEach { type ->
+                                PokemonTypeChip(type = type)
+                            }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    item {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(text = poke.species ?: "N/A", fontSize = 20.sp, color = Color.Gray)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = poke.description ?: "No description available.",
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                        }
+                    }
 
-                    Text(text = poke.species ?: "N/A", fontSize = 20.sp, color = Color.Gray)
-                    Text(text = poke.description ?: "No description available.", modifier = Modifier.padding(top = 8.dp))
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    BaseStatsSection(pokemon = poke)
+                    item {
+                        BaseStatsSection(pokemon = poke)
+                    }
+                    
+                    // Extra spacer at bottom to ensure stats are fully visible
+                    item {
+                        Spacer(modifier = Modifier.height(32.dp))
+                    }
                 }
             }
         }
@@ -87,7 +104,7 @@ fun BaseStatsSection(pokemon: PokemonEntity) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text("Base Stats", fontSize = 24.sp)
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         StatRow(label = "HP", value = pokemon.hp)
         StatRow(label = "Attack", value = pokemon.attack)
@@ -124,12 +141,22 @@ fun BaseStatsSectionPreview() {
 @Composable
 fun StatRow(label: String, value: Int) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = label, modifier = Modifier.width(120.dp))
         Text(text = value.toString(), modifier = Modifier.width(40.dp))
-        // Placeholder for the progress bar
+        LinearProgressIndicator(
+            progress = { value / 255f },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(8.dp)
+                .clip(RoundedCornerShape(4.dp)),
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = Color.LightGray
+        )
     }
 }
 
